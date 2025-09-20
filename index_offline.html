@@ -1,0 +1,747 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>Aclara Admin — OFFLINE</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="theme-color" content="#F472B6"/>
+<style>
+  /* =====================
+     Aclara Admin — Design System (OFFLINE)
+     Paleta pastel + blancos, mobile-first
+     ===================== */
+  :root{
+    --bg:#FFF6FA;             /* fondo rosado muy suave */
+    --text:#1F2937;           /* gris oscuro legible */
+    --muted:#6B7280;          /* gris secundario */
+    --border:#F8D7E4;         /* borde pastel */
+    --card:#FFFFFF;           /* tarjetas blancas */
+    --primary:#F472B6;        /* rosa pastel principal */
+    --primary-700:#DB2777;    /* rosa más intenso (hover) */
+    --ring:rgba(244,114,182,.35);/* foco suave */
+    --shadow:0 10px 30px rgba(244,114,182,.08);/* sombra sutil rosada */
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto;background:var(--bg);color:var(--text)}
+  .container{max-width:1200px;margin:0 auto;padding:16px}
+  .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+  .title{font-size:22px;font-weight:700;letter-spacing:.2px}
+  .title strong{color:var(--primary)}
+  .badge,.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:4px 10px;border-radius:999px;border:1px solid var(--border);background:#F3F4F6;color:#374151}
+  .card{border:1px solid var(--border);border-radius:var(--radius);background:var(--card);box-shadow:var(--shadow)}
+  .content{padding:16px}
+  .btn{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 16px;font-size:15px;border-radius:12px;border:1px solid var(--border);background:white;color:var(--text);cursor:pointer;transition:all .15s ease}
+  .btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,0,0,.05)}
+  .btn:active{transform:translateY(0)}
+  .btn:disabled{opacity:.6;cursor:not-allowed;box-shadow:none;transform:none}
+  .btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+  .btn.primary:hover{background:var(--primary-700);border-color:var(--primary-700)}
+  .btn.red{background:#dc2626;color:#fff;border-color:#b91c1c}
+  .input,.select,.textarea{width:100%;border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:14px;outline:none;background:white;color:var(--text);transition:box-shadow .15s ease,border-color .15s ease}
+  .input:focus,.select:focus,.textarea:focus{box-shadow:0 0 0 4px var(--ring);border-color:var(--primary)}
+  .label{display:block;font-size:12px;color:var(--muted);margin:2px 0 6px}
+  .hint{font-size:12px;color:var(--muted)}
+  .row{display:grid;gap:12px}
+  .tabs{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;border:1px solid var(--border);border-radius:12px;background:white;padding:6px;box-shadow:var(--shadow)}
+  .tab{border-radius:10px;padding:10px 12px;text-align:center;cursor:pointer;font-size:14px;color:#334155;transition:background .15s ease,color .15s ease,transform .15s ease}
+  .tab:hover{transform:translateY(-1px)}
+  .tab.active{background:var(--primary);color:#fff}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  thead{background:#F9FAFB}
+  th,td{text-align:left;padding:12px;border-bottom:1px solid #EEF2F7;vertical-align:top}
+  tbody tr:hover{background:#FAFAFB}
+  .preview-img{width:56px;height:56px;border-radius:12px;object-fit:cover;border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.06)}
+  .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(2,6,23,.35);z-index:50}
+  .dialog{width:min(640px,94%);background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .brand-logo{height:36px;width:auto;display:block;border-radius:8px}
+  /* Mobile nav dropdown wrapper (oculto en desktop) */
+  #mobile-nav-wrap{display:none;margin:8px 0}
+  #mobile-nav{width:100%;border:1px solid var(--border);border-radius:12px;padding:12px;background:#fff;font-size:16px}
+  .sticky-total{position:relative}
+  .sticky-actions{position:relative}
+
+  /* Desktop layout helpers */
+  @media(min-width:900px){
+    .row.cols-2{grid-template-columns:1fr 1fr}
+    .row.cols-3{grid-template-columns:1fr 1fr 1fr}
+    .row.cols-4{grid-template-columns:repeat(4,1fr)}
+    .layout-5{grid-template-columns:3fr 2fr}
+  }
+  /* Mobile-first overrides */
+  @media(max-width:899px){
+    .container{padding:10px}
+    .header{flex-direction:column;align-items:flex-start;gap:10px}
+    .title{font-size:20px}
+    .input,.select,.textarea{font-size:16px;padding:14px}
+    .tab{padding:12px 10px;font-size:15px}
+    /* Mobile nav: ocultar tabs y usar dropdown */
+    .tabs{display:none}
+    #mobile-nav-wrap{display:block}
+    /* Formulario mobile */
+    .card{border-radius:16px}
+    .content{padding:14px}
+    .row{gap:10px}
+    .row.cols-2,.row.cols-3,.row.cols-4{grid-template-columns:1fr}
+    .sticky-total{position:sticky;bottom:0;z-index:20;background:linear-gradient(180deg,rgba(255,246,250,0),var(--bg) 30%);padding-top:6px}
+    .sticky-actions{position:sticky;bottom:8px;display:flex;gap:8px;justify-content:flex-end}
+    .btn{height:48px;border-radius:14px}
+  }
+</style>
+</head>
+<body>
+<div class="container" id="app">
+  <div style="padding:32px; text-align:center; color:#6b7280">Cargando…</div>
+</div>
+
+<script>
+(function(){
+  // Bloqueo preventivo de document.write para evitar errores en ciertos navegadores// document.write override eliminado para evitar errores en entornos restringidos
+const LS_KEY = 'aclara-admin-offline-v4';
+  const STATUS = ['Nuevo','Pagado','Procesado','Empacado','Enviado','Entregado','Cancelado'];
+  let state = null; let currentTab='form';
+  // Filtros contabilidad
+  let contaFiltros = { desde:'', hasta:'', estado:'Todos' };
+
+  const currency = (n)=> new Intl.NumberFormat('es-DO',{style:'currency',currency:'DOP'}).format(Number(n||0));
+  const uid = ()=> Math.random().toString(36).slice(2,9);
+
+  // Logo inline para no depender de archivos
+  const LOGO_SVG = `data:image/svg+xml;utf8,
+    <svg xmlns='http://www.w3.org/2000/svg' width='160' height='40' viewBox='0 0 320 80'>
+      <defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'><stop offset='0%' stop-color='%23ff9ecd'/><stop offset='100%' stop-color='%23f472b6'/></linearGradient></defs>
+      <rect rx='12' ry='12' width='320' height='80' fill='white'/>
+      <circle cx='56' cy='40' r='32' fill='none' stroke='%23f197c6' stroke-width='6'/>
+      <text x='96' y='50' font-family='Segoe UI, Roboto, sans-serif' font-size='28' font-weight='700' fill='url(%23g)'>Aclara Admin</text>
+    </svg>`;
+
+  // ==== Code39 ====
+  const CODE39 = {'0':'101001101101','1':'110100101011','2':'101100101011','3':'110110010101','4':'101001101011','5':'110100110101','6':'101100110101','7':'101001011011','8':'110100101101','9':'101100101101','A':'110101001011','B':'101101001011','C':'110110100101','D':'101011001011','E':'110101100101','F':'101101100101','G':'101010011011','H':'110101001101','I':'101101001101','J':'101011001101','K':'110101010011','L':'101101010011','M':'110110101001','N':'101011010011','O':'110101101001','P':'101101101001','Q':'101010110011','R':'110101011001','S':'101101011001','T':'101011011001','U':'110010101011','V':'100110101011','W':'110011010101','X':'100101101011','Y':'110010110101','Z':'100110110101','-':'100101011011','.':'110010101101',' ':'100110101101','*':'100101101101','/':'100101101001','+':'100101001101','%':'101001101001'};
+  function toCode39(text){ const t='*'+String(text).toUpperCase()+'*'; const seq=[]; for(const ch of t){ seq.push(CODE39[ch]||CODE39[' '], '0'); } return seq.join(''); }
+  function makeCode39SVG(bits, narrow=2, wide=5, height=160){ let x=0, bars=[]; for(let i=0;i<bits.length;i++){ const w=(bits[i]==='1'?wide:narrow); if(i%2===0){ bars.push(`<rect x='${x}' y='0' width='${w}' height='${height}'/>`);} x+=w; } return `<svg xmlns='http://www.w3.org/2000/svg' width='${x}' height='${height}' viewBox='0 0 ${x} ${height}' shape-rendering='crispEdges'>${bars.join('')}</svg>`; }
+  function toCode39SVG(text, narrow=2, wide=5, height=160){ return makeCode39SVG(toCode39(text), narrow, wide, height); }
+
+  // ==== Estado por defecto ====
+  function defaultState(){
+    const adminId = uid();
+    return {
+      inventario:[
+        { id:uid(), sku:'ACL-CR-120', nombre:'Crema Aclara 4 oz', precio:1300, stock:25, foto:null },
+        { id:uid(), sku:'ACL-GL-050', nombre:'Glow Lift 50 ml',   precio:2200, stock:12, foto:null },
+        { id:uid(), sku:'ACL-VC-030', nombre:'Sérum Vitamina C 30 ml', precio:1600, stock:30, foto:null }
+      ],
+      pedidos:[],
+      usuarios:[{ id:adminId, nombre:'Admin', email:'', rol:'Admin', pin:'0000' }],
+      currentUser:null, // público inicialmente → solo formulario
+      entregas:[] // historial de escaneos / entregas
+    };
+  }
+
+  // ==== Storage local ====
+  function loadLocal(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)) || defaultState(); }catch{ return defaultState(); } }
+  function saveLocal(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch{} }
+  function setState(mutator){ state = (typeof mutator==='function') ? mutator(state) : { ...state, ...mutator }; saveLocal(); render(); }
+
+  // ==== Helpers UI ====
+  const el=(s,r=document)=>r.querySelector(s); const els=(s,r=document)=>Array.from(r.querySelectorAll(s));
+  const imgPreview=(dataUrl)=> dataUrl?`<img src='${dataUrl}' class='preview-img' alt='img'/>`:`<div class='preview-img' style='background:#f3f4f6'></div>`;
+  function table(headers, rowsHtml){ return `<div class='card'><div class='content' style='padding:0'><table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rowsHtml}</tbody></table></div></div>`; }
+  function exportCSV(rows, filename){ if(!rows?.length) return; const head=Object.keys(rows[0]).join(','); const body=rows.map(r=>Object.values(r).map(v=>`"${String(v).replaceAll('"','""')}"`).join(',')).join('\n'); const blob=new Blob([head+'\n'+body],{type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; a.click(); URL.revokeObjectURL(url); }
+  function fileToDataURL(file){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(String(r.result)); r.onerror=rej; r.readAsDataURL(file); }); }
+
+  // ==== Impresión (sin document.write) ====
+  function openHTML(html){
+    try{
+      const blob = new Blob([html], {type:'text/html;charset=utf-8'});
+      const url = URL.createObjectURL(blob);
+      // 1) Intentar abrir en nueva pestaña/ventana
+      const w = window.open('', '_blank');
+      if (w && !w.closed) {
+        // Cargar por navegación (evita document.write)
+        w.location = url;
+        setTimeout(()=> URL.revokeObjectURL(url), 8000);
+        return url;
+      }
+      // 2) Fallback: usar iframe oculto en la misma página
+      let iframe = document.getElementById('print-fallback-frame');
+      if(!iframe){
+        iframe = document.createElement('iframe');
+        iframe.id = 'print-fallback-frame';
+        iframe.style.position='fixed';
+        iframe.style.right='8px';
+        iframe.style.bottom='8px';
+        iframe.style.width='0';
+        iframe.style.height='0';
+        iframe.style.border='0';
+        iframe.style.opacity='0';
+        document.body.appendChild(iframe);
+      }
+      iframe.src = url;
+      // intentar imprimir cuando cargue
+      iframe.onload = ()=>{ try{ iframe.contentWindow?.focus(); iframe.contentWindow?.print(); }catch{} };
+      // aviso visible para el usuario
+      const noteId = 'print-note';
+      if(!document.getElementById(noteId)){
+        const note = document.createElement('div');
+        note.id = noteId;
+        note.style.position='fixed'; note.style.left='50%'; note.style.transform='translateX(-50%)';
+        note.style.bottom='12px'; note.style.padding='10px 14px'; note.style.background='#111827'; note.style.color='#fff'; note.style.borderRadius='10px'; note.style.zIndex='9999';
+        note.textContent = 'El navegador bloqueó la ventana emergente. Se abrió una vista oculta para imprimir. Revisa el diálogo de impresión.';
+        document.body.appendChild(note);
+        setTimeout(()=> note.remove(), 4500);
+      }
+      setTimeout(()=> URL.revokeObjectURL(url), 10000);
+      return url;
+    }catch(e){ console.warn('openHTML error', e); alert('No se pudo abrir la vista de impresión.'); }
+  }
+      setTimeout(()=> URL.revokeObjectURL(url), 5000);
+      return url;
+    }catch(e){ console.warn('openHTML error', e); alert('No se pudo abrir la vista de impresión.'); }
+  }
+
+  // ==== Impresión 4×6 (solo etiqueta) ====
+  function printLabel4x6(p){
+    const primary=(p.envio?.couriers||[])[0]||{};
+    const svg=toCode39SVG(p.codigo, 4, 9, 220); // barras gruesas y altas
+    const html = `<!doctype html><html><head><meta charset='utf-8'><title>Etiqueta ${p.codigo}</title>
+  <style>
+    @page{size:4in 6in;margin:.15in}
+    body{font-family:ui-sans-serif,system-ui;margin:0;padding:.05in;font-size:16px}
+    .wrap{width:100%;height:100%}
+    .row{display:flex;justify-content:space-between;align-items:flex-start}
+    .big{font-size:32px;font-weight:800;letter-spacing:.5px}
+    .mid{font-size:20px;font-weight:700}
+    .small{font-size:16px;color:#111}
+    .box{border:2px solid #000;padding:10px;margin:10px 0;border-radius:6px}
+    .code{text-align:center;margin-top:12px}
+    .hr{border-top:2px dashed #000;margin:10px 0}
+    .mono{font-family: ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing:.5px}
+  </style>
+  </head><body>
+  <div class='wrap'>
+    <div class='row'><div class='big'>ACLARA</div><div class='small'>${new Date(p.fecha).toLocaleDateString('es-DO')}</div></div>
+    <div class='box'><div class='mid'><strong>DE:</strong> Aclara Natural Glow</div><div class='small'>www.cremaaclara.com • @crema.aclara</div></div>
+    <div class='box'><div class='mid'><strong>PARA:</strong> ${p.cliente.nombre}</div><div class='small'>${p.cliente.telefono||''}</div></div>
+    <div class='box'>
+      <div class='mid'><strong>COURIER:</strong> <span class='mono'>${primary.courier||''}</span></div>
+      <div class='small'><strong>Sucursal:</strong> <span class='mono'>${primary.sucursal||''}</span></div>
+      <div class='small'><strong>Modalidad:</strong> ${p.envio?.modalidad||''}</div>
+      ${primary.cod?`<div class='small'><strong>COD:</strong> ${currency(primary.codMonto||p.total)}</div>`:''}
+    </div>
+    <div class='hr'></div>
+    <div class='mid'><strong>Pedido:</strong> <span class='mono'>${p.codigo}</span> • <strong>Ítems:</strong> ${p.items.reduce((n,i)=>n+Number(i.cantidad||0),0)}</div>
+    <div class='small'>Subtotal: ${currency(p.subtotal ?? (p.total - (p.envio?.costo||0)))} • Envío: ${currency(p.envio?.costo||0)} • Total: ${currency(p.total)}</div>
+    <div class='hr'></div>
+    <div class='code'>${svg}</div>
+  </div>
+  <script>window.onload=()=>window.print();<\/script>
+  </body></html>`;
+    openHTML(html);
+  }
+
+  // === Nota de pedido en A4 ===
+  function printOrder(p){
+    const couriers = p.envio?.couriers || [];
+    const courList = couriers.length
+      ? `<ul style='margin:6px 0 0 18px'>${couriers.map(c=>`<li>${[c.courier,c.sucursal].filter(Boolean).join(' — ')}${c.cod?` (COD: ${currency(c.codMonto||p.total)})`:''}${(typeof c.costo==='number')?` · Envío: ${currency(c.costo)}`:''}</li>`).join('')}</ul>`
+      : '<div>—</div>';
+    const comp = p.comprobante?.dataUrl
+      ? `<div style='margin-top:10px'><div style='font-weight:600;margin-bottom:4px'>Comprobante de pago</div><img src='${p.comprobante.dataUrl}' style='max-width:360px;border:1px solid #ddd;border-radius:8px'/></div>`
+      : '';
+    const html = `<!doctype html><html><head><meta charset='utf-8'><title>Pedido ${p.codigo}</title>
+      <style>
+        @page{size:A4;margin:18mm}
+        body{font-family:ui-sans-serif,system-ui;color:#111}
+        h1{font-size:22px;margin:0 0 6px}
+        h2{font-size:16px;margin:14px 0 6px}
+        .muted{color:#555}
+        table{width:100%;border-collapse:collapse;margin-top:8px}
+        th,td{border-bottom:1px solid #e5e7eb;padding:8px;text-align:left}
+        th{background:#fafafa}
+        .right{text-align:right}
+        .summary{margin-top:8px;display:grid;grid-template-columns:1fr auto;gap:4px}
+      </style>
+    </head><body>
+      <h1>Aclara Natural Glow — Pedido ${p.codigo}</h1>
+      <div class='muted'>Fecha: ${new Date(p.fecha).toLocaleString('es-DO')}</div>
+
+      <h2>Cliente</h2>
+      <div><strong>${p.cliente.nombre}</strong></div>
+      <div>${p.cliente.telefono||''}</div>
+
+      <h2>Envío / Courier</h2>
+      <div><strong>Modalidad:</strong> ${p.envio?.modalidad||''}</div>
+      ${courList}
+
+      <h2>Productos</h2>
+      <table>
+        <thead><tr><th>Producto</th><th>Cant.</th><th class='right'>Precio</th><th class='right'>Total</th></tr></thead>
+        <tbody>
+          ${p.items.map(i=>`<tr><td>${i.nombre}</td><td>${i.cantidad}</td><td class='right'>${currency(i.precio)}</td><td class='right'>${currency(i.precio*i.cantidad)}</td></tr>`).join('')}
+        </tbody>
+      </table>
+
+      <h2>Resumen</h2>
+      <div class='summary'>
+        <div>Subtotal</div><div class='right'>${currency(p.subtotal ?? (p.total - (p.envio?.costo||0)))}</div>
+        <div>Envío (courier principal)</div><div class='right'>${currency(p.envio?.costo||0)}</div>
+        <div style='font-weight:700'>Total</div><div class='right' style='font-weight:700'>${currency(p.total)}</div>
+      </div>
+
+      ${comp}
+
+      <h2>Notas</h2>
+      <div>${p.notas||'—'}</div>
+
+      <div class='muted' style='margin-top:16px'>Estado: ${p.estado}</div>
+    </body></html>`;
+    openHTML(html);
+  }
+
+  // ==== Vistas ====
+  function renderHeader(){
+    const authed = !!state?.currentUser;
+    const modeChip = `<span class="chip">${authed? 'Privado (sesión)': 'Público'}</span>`;
+    const logoutBtn = state.currentUser ? `<button class="btn" id="btn-logout">Salir</button>` : '';
+    return `<div class="header">
+      <div style="display:flex; align-items:center; gap:12px">
+        <img src="${LOGO_SVG}" class="brand-logo" alt="Aclara"/>
+        <div>
+          <div class="title">Aclara <strong>Admin</strong></div>
+          <div class="hint">${authed? 'Secciones internas desbloqueadas.' : 'Solo el formulario está disponible sin iniciar sesión.'}</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px">
+        ${modeChip}
+        <span class="badge">${state.currentUser?.rol || 'Invitado'}</span>
+        <span class="hint">${state.currentUser?.nombre || 'Sin sesión'}</span>
+        <button class="btn" id="btn-login">${state.currentUser ? 'Cambiar usuario' : 'Iniciar sesión'}</button>
+        ${logoutBtn}
+      </div>
+    </div>`;
+  }
+
+  function renderTabs(){
+    const authed = !!state?.currentUser;
+    const role = state.currentUser?.rol || 'Invitado';
+    let items = [['form','✍️ Formulario'],['delivery','📷 Delivery (Scan)']];
+    if(authed){
+      items = [['inventario','📦 Inventario'],['pedidos','🛒 Pedidos'],['clientes','👥 Clientes']];
+      if(role==='Admin'){ items.push(['conta','📊 Contabilidad'],['usuarios','👤 Usuarios']); }
+      items.push(['form','✍️ Formulario'],['delivery','📷 Delivery (Scan)']);
+    }
+    const desktopTabs = `<div class='tabs' style='margin-bottom:12px'>${items.map(([k,l])=>`<div class='tab ${currentTab===k?'active':''}' data-tab='${k}'>${l}</div>`).join('')}</div>`;
+    const mobileNav = `<div id='mobile-nav-wrap'><select id='mobile-nav'>${items.map(([k,l])=>`<option value='${k}' ${currentTab===k?'selected':''}>${l}</option>`).join('')}</select></div>`;
+    return mobileNav + desktopTabs;
+  }
+
+  function renderInventario(){
+    const canEdit = state.currentUser?.rol==='Admin';
+    const rows = state.inventario.map(p=>`\n      <tr>\n        <td>${imgPreview(p.foto?.dataUrl)}</td>\n        <td class='hint'>${p.sku||'—'}</td>\n        <td>${p.nombre}</td>\n        <td>${currency(p.precio)}</td>\n        <td>${p.stock}</td>\n        <td>\n          <div class='toolbar'>\n            <button class='btn' ${!canEdit?'disabled':''} data-act='edit-product' data-id='${p.id}'>✏️ Editar</button>\n            <button class='btn red' ${!canEdit?'disabled':''} data-act='del-product' data-id='${p.id}'>🗑️ Eliminar</button>\n          </div>\n        </td>\n      </tr>`).join('');
+    return `<div class='row' style='gap:16px'>\n      <div class='toolbar'>\n        <span class='hint'>Productos totales: <b>${state.inventario.length}</b></span>\n        <button class='btn primary' ${!canEdit?'disabled':''} id='btn-new-product'>➕ Nuevo producto</button>\n      </div>\n      ${table(['Foto','SKU','Producto','Precio','Stock','Acciones'], rows)}\n    </div>`;
+  }
+
+  function showProductoForm(editId){
+    const p = editId? state.inventario.find(x=>x.id===editId) : { sku:'', nombre:'', precio:'', stock:'', foto:null };
+    const html = `<div class='overlay' id='inv-ov'><div class='dialog'><div class='content'>\n      <div class='title'>${editId?'Editar':'Agregar'} producto</div>\n      <div class='row cols-2'>\n        <div><label class='label'>SKU</label><input id='p-sku' class='input' value='${p.sku||''}'/></div>\n        <div><label class='label'>Nombre</label><input id='p-nombre' class='input' value='${p.nombre||''}'/></div>\n        <div><label class='label'>Precio (DOP)</label><input id='p-precio' type='number' class='input' value='${p.precio||''}'/></div>\n        <div><label class='label'>Stock</label><input id='p-stock' type='number' class='input' value='${p.stock||0}'/></div>\n        <div><label class='label'>Foto del producto</label><input id='p-foto' type='file' accept='image/*' class='input'/></div>\n        ${p.foto?.dataUrl?`<div><img src='${p.foto.dataUrl}' class='preview-img'/></div>`:''}\n      </div>\n      <div style='display:flex; justify-content:flex-end; gap:8px; margin-top:12px'>\n        <button class='btn' id='p-cancel'>Cancelar</button>\n        <button class='btn primary' id='p-save'>Guardar</button>\n      </div>\n    </div></div></div>`;
+    document.body.insertAdjacentHTML('beforeend', html);
+    const ov=el('#inv-ov'); el('#p-cancel',ov).onclick=()=>ov.remove();
+    el('#p-save',ov).onclick=async()=>{
+      const sku=el('#p-sku',ov).value.trim(); const nombre=el('#p-nombre',ov).value.trim(); const precio=Number(el('#p-precio',ov).value||0); const stock=Number(el('#p-stock',ov).value||0);
+      let foto=p.foto||null; const file=el('#p-foto',ov).files[0]; if(file){ if(!file.type.startsWith('image/')) return alert('Sube una imagen'); if(file.size>2*1024*1024) return alert('Máx 2MB'); const dataUrl=await fileToDataURL(file); foto={ name:file.name, type:file.type, size:file.size, dataUrl }; }
+      if(!nombre || !precio) return alert('Completa nombre y precio');
+      setState(s=>{ const inv=[...s.inventario]; if(editId){ const i=inv.findIndex(x=>x.id===editId); inv[i]={...inv[i], sku,nombre,precio,stock,foto}; } else { inv.unshift({ id:uid(), sku,nombre,precio,stock,foto }); } return { ...s, inventario:inv }; });
+      ov.remove();
+    };
+    ov.addEventListener('click',(e)=>{ if(e.target===ov) ov.remove(); });
+  }
+
+  function renderForm(){
+    return `<form id='order-form' class='row' style='gap:12px'>
+      <div class='card'><div class='content'>
+        <div style='font-weight:600;font-size:15px;margin-bottom:6px'>Información del Cliente</div>
+        <div class='row cols-2'>
+          <div>
+            <label class='label'>Nombre *</label>
+            <input name='c-nombre' class='input' placeholder='Nombre y Apellido' autocomplete='name' />
+          </div>
+          <div>
+            <label class='label'>Teléfono</label>
+            <input name='c-telefono' class='input' placeholder='829 000 0000' inputmode='tel' autocomplete='tel' />
+          </div>
+          <div>
+            <label class='label'>Modalidad</label>
+            <select name='env-modalidad' class='select'>
+              <option>Retiro en establecimiento</option>
+              <option>Envío a domicilio</option>
+            </select>
+          </div>
+        </div>
+        <div style='margin-top:10px; font-weight:600; font-size:14px'>Couriers (puedes agregar varios)</div>
+        <div id='couriers'></div>
+        <div style='margin-top:8px'><button class='btn' type='button' id='courier-add'>➕ Agregar courier</button></div>
+      </div></div>
+
+      <div class='card'><div class='content'>
+        <div style='display:flex; align-items:center; justify-content:space-between'>
+          <div style='font-weight:600; font-size:15px'>Productos</div>
+          <button class='btn' type='button' id='line-add'>➕ Agregar línea</button>
+        </div>
+        <div id='lines' class='row' style='gap:10px; margin-top:6px'></div>
+
+        <div class='row cols-2' style='margin-top:6px'>
+          <div>
+            <label class='label'>Comprobante de pago (foto)</label>
+            <input id='comp-file' type='file' accept='image/*' class='input'/>
+            <div id='comp-preview' style='margin-top:8px'></div>
+          </div>
+          <div>
+            <label class='label'>Notas</label>
+            <textarea id='order-notas' class='textarea' placeholder='Instrucciones de envío, referencia, etc.' rows='3'></textarea>
+          </div>
+        </div>
+
+        <div class='sticky-total'>
+          <div id='totales' style='display:grid; gap:8px; margin-top:8px'></div>
+          <div class='sticky-actions'>
+            <button class='btn primary' type='submit' style='min-width:180px'>🛒 Guardar Pedido</button>
+          </div>
+        </div>
+      </div></div>
+    </form>`;
+  }
+
+  function calcTotales(lines, primaryCosto){ const subtotal=lines.reduce((s,l)=> s + (Number(l.precio)||0)*(Number(l.cantidad)||0),0); const envio=Number(primaryCosto||0); return { subtotal, envio, total: subtotal+envio }; }
+  function renderLines(lines){ const productos=state.inventario; return lines.map(l=>`<div class='row cols-4' style='align-items:end' data-line='${l.id}'>\n      <div style='grid-column:1 / span 2'><label class='label'>Producto</label>\n        <select class='select' data-role='prod'>${productos.map(p=>`<option value='${p.id}' ${p.id===l.productoId?'selected':''}>${p.nombre} — ${currency(p.precio)}</option>`).join('')}</select>\n        ${(()=>{ const p=productos.find(p=>p.id===l.productoId); return p?.foto?.dataUrl?`<div style='margin-top:6px'><img src='${p.foto.dataUrl}' class='preview-img'/></div>`:''; })()}\n      </div>\n      <div><label class='label'>Cantidad</label><input class='input' type='number' min='1' value='${l.cantidad}' data-role='cant'/></div>\n      <div style='display:flex; align-items:center'><button class='btn red' type='button' data-role='rm'>🗑️ Quitar</button></div>\n    </div>`).join(''); }
+  function renderCouriers(cs){ return cs.map((c,idx)=>`<div class='row cols-4' style='align-items:end;border:1px solid var(--border);border-radius:12px;padding:12px;margin-top:8px' data-courier='${c.id}'>\n      <div><label class='label'>Courier</label><select class='select' data-role='courier'>${['','MetroPac','BM Cargo','Vimenpaq','PickNDrop','UPS','FedEx','DHL','INPOSDOM','Otro'].map(o=>`<option ${o===c.courier?'selected':''}>${o}</option>`).join('')}</select></div>\n      <div><label class='label'>Establecimiento / Sucursal</label><input class='input' data-role='sucursal' value='${c.sucursal||''}' placeholder='Ej: MetroPac - Plaza Central'/></div>\n      <div><label class='label'>Costo de Envío (DOP)</label><input class='input' type='number' data-role='costo' value='${c.costo||0}' placeholder='0'/></div>\n      <div><label class='label'>Pago contra entrega (COD)</label><div style='display:flex; gap:8px'><input type='checkbox' data-role='cod' ${c.cod?'checked':''}/><input type='number' class='input' style='flex:1' data-role='codm' value='${c.codMonto||0}' ${c.cod?'':'disabled'} placeholder='Monto COD'/></div></div>\n      <div style='grid-column:1 / -1; display:flex; justify-content:flex-end'>${idx>0?`<button class='btn red' type='button' data-role='rmc'>Eliminar courier</button>`:''}</div>\n      ${idx===0?`<div class='hint' style='grid-column:1 / -1'>El primer courier se considera <b>principal</b> para calcular envío del total e imprimir la etiqueta.</div>`:''}\n    </div>`).join(''); }
+
+  function renderPedidos(){ const rows=state.pedidos.map(p=>{ const n=p.envio?.couriers?.length||0; const f=p.envio?.couriers?.[0]; const label=f?`${f.courier}${f.sucursal?' — '+f.sucursal:''}${n>1?` (+${n-1})`:''}`:'—'; return `<tr data-pid='${p.id}'>
+      <td><b>${p.codigo}</b></td><td class='hint'>${new Date(p.fecha).toLocaleString('es-DO')}</td><td>${p.cliente.nombre}</td><td class='hint'>${label}</td><td>${currency(p.total)}</td>
+      <td><select class='select' data-role='estado'>${STATUS.map(s=>`<option ${s===p.estado?'selected':''}>${s}</option>`).join('')}</select></td>
+      <td><div class='toolbar'>
+        <button class='btn' data-act='proc'>✅ Procesado</button>
+        <button class='btn' data-act='env'>🚚 Enviado</button>
+        <button class='btn' data-act='printA4'>🖨️ Nota A4</button>
+        <button class='btn' data-act='label'>🖨️ Etiqueta 4×6</button>
+        <button class='btn red' data-act='del' ${state.currentUser?.rol==='Admin'?'':'disabled'}>🗑️ Borrar</button>
+      </div></td>
+    </tr>`; }).join('');
+    return `<div class='row' style='gap:16px'>
+      <div class='toolbar'>
+        <span class='hint'>Pedidos: <b>${state.pedidos.length}</b></span>
+        <button class='btn' id='ped-export'>⬇️ Exportar CSV</button>
+        <a class='btn' href='#delivery' onclick='return false'>📷 Ir a Delivery Scan</a>
+      </div>
+      ${table(['Código','Fecha','Cliente','Courier','Total','Estado','Acciones'], rows)}
+    </div>`; }
+
+  function renderClientes(){ const map=new Map(); state.pedidos.forEach(p=>{ const key=(p.cliente.telefono||p.cliente.nombre).trim()||p.cliente.nombre; const prev=map.get(key)||{nombre:p.cliente.nombre, telefono:p.cliente.telefono||'', pedidos:0, total:0}; prev.pedidos+=1; prev.total+=p.total; map.set(key,prev); }); const list=Array.from(map.values()).sort((a,b)=>b.total-a.total); const rows=list.map(c=>`<tr><td>${c.nombre}</td><td class='hint'>${c.telefono||'—'}</td><td>${c.pedidos}</td><td>${currency(c.total)}</td></tr>`).join(''); return `<div class='row' style='gap:16px'><div class='toolbar'><button class='btn' id='cli-export'>⬇️ Exportar CSV</button></div>${table(['Cliente','Teléfono','Pedidos','Total'], rows)}</div>`; }
+
+  function renderUsuarios(){ const isAdmin=state.currentUser?.rol==='Admin'; if(!isAdmin){ return `<div class='card'><div class='content'><div class='hint'>Acceso restringido. Solo <b>Administradores</b> pueden gestionar usuarios.</div></div></div>`; } const rows=state.usuarios.map(u=>`<tr data-uid='${u.id}'><td>${u.nombre}</td><td class='hint'>${u.email||'—'}</td><td>${u.rol}</td><td><button class='btn red' data-act='udel' ${state.currentUser?.id===u.id?'disabled':''}>🗑️ Eliminar</button></td></tr>`).join(''); return `<div class='row' style='gap:16px'><div class='toolbar'><span class='hint'>Usuarios: <b>${state.usuarios.length}</b></span><button class='btn primary' id='usr-new'>➕ Nuevo usuario</button></div>${table(['Nombre','Email','Rol','Acciones'], rows)}</div>`; }
+  function showUserForm(){ const html=`<div class='overlay' id='usr-ov'><div class='dialog'><div class='content'><div class='title'>Agregar usuario</div><div class='row cols-2'><div><label class='label'>Nombre</label><input id='u-nombre' class='input'/></div><div><label class='label'>Email</label><input id='u-email' type='email' class='input'/></div><div><label class='label'>Rol</label><select id='u-rol' class='select'><option>Admin</option><option>Vendedor</option><option>Operador</option><option>Visor</option></select></div><div><label class='label'>PIN (4-6 dígitos)</label><input id='u-pin' type='password' class='input' placeholder='0000'/></div></div><div style='display:flex;justify-content:flex-end;gap:8px;margin-top:12px'><button class='btn' id='u-cancel'>Cancelar</button><button class='btn primary' id='u-save'>Guardar</button></div></div></div></div>`; document.body.insertAdjacentHTML('beforeend',html); const ov=el('#usr-ov'); el('#u-cancel',ov).onclick=()=>ov.remove(); el('#u-save',ov).onclick=()=>{ const nombre=el('#u-nombre',ov).value.trim(); const email=el('#u-email',ov).value.trim(); const rol=el('#u-rol',ov).value; const pin=el('#u-pin',ov).value.trim(); if(!nombre||!pin) return alert('Nombre y PIN son obligatorios'); setState(s=>({...s, usuarios:[{id:uid(), nombre, email, rol, pin}, ...s.usuarios]})); ov.remove(); }; ov.addEventListener('click',(e)=>{ if(e.target===ov) ov.remove(); }); }
+
+  // ===== Contabilidad =====
+  function renderContabilidad(){
+    const f=contaFiltros;
+    return `
+      <div class='row' style='gap:16px'>
+        <div class='card'><div class='content'>
+          <div style='font-weight:600; font-size:14px; margin-bottom:6px'>Filtros</div>
+          <div class='row cols-4'>
+            <div><label class='label'>Desde</label><input type='date' id='co-desde' class='input' value='${f.desde||''}'/></div>
+            <div><label class='label'>Hasta</label><input type='date' id='co-hasta' class='input' value='${f.hasta||''}'/></div>
+            <div><label class='label'>Estado</label>
+              <select id='co-estado' class='select'>
+                ${['Todos',...STATUS].map(s=>`<option ${s===f.estado?'selected':''}>${s}</option>`).join('')}
+              </select>
+            </div>
+            <div style='display:flex; align-items:flex-end'>
+              <button class='btn' id='co-aplicar'>Aplicar</button>
+            </div>
+          </div>
+        </div></div>
+
+        <div id='co-cards' class='row cols-4'></div>
+        <div class='toolbar'>
+          <button class='btn' id='co-export'>⬇️ Exportar CSV (filtrado)</button>
+        </div>
+        <div id='co-tabla'></div>
+      </div>`;
+  }
+
+  function calcularContabilidad(){
+    const {desde,hasta,estado}=contaFiltros;
+    const from = desde ? new Date(desde+'T00:00:00') : null;
+    const to   = hasta ? new Date(hasta+'T23:59:59') : null;
+    const rows = state.pedidos.filter(p=>{
+      const d=new Date(p.fecha);
+      if(from && d<from) return false;
+      if(to && d>to) return false;
+      if(estado && estado!=='Todos' && p.estado!==estado) return false;
+      return true;
+    });
+    let subtotal=0, envio=0, total=0, cod=0;
+    rows.forEach(p=>{
+      subtotal += Number(p.subtotal ?? (p.total - (p.envio?.costo||0)));
+      envio    += Number(p.envio?.costo||0);
+      total    += Number(p.total||0);
+      const first=p.envio?.couriers?.[0]; if(first?.cod){ cod += Number(first.codMonto || p.total); }
+    });
+    const promedio = rows.length? total/rows.length : 0;
+    const porEstado = STATUS.reduce((acc,s)=>{ acc[s]=rows.filter(p=>p.estado===s).length; return acc; },{});
+    return { rows, resumen:{subtotal,envio,total,cod,promedio,conteo:rows.length, porEstado} };
+  }
+
+  function renderContabilidadContenido(){
+    const {rows, resumen} = calcularContabilidad();
+    const card = (titulo,valor,desc='')=>`<div class='card'><div class='content'><div class='hint'>${titulo}</div><div style='font-size:22px;font-weight:700'>${valor}</div><div class='hint'>${desc}</div></div></div>`;
+    const cardsHTML = [
+      card('Total vendido', currency(resumen.total)),
+      card('Subtotal (sin envío)', currency(resumen.subtotal)),
+      card('Costos de envío (principal)', currency(resumen.envio)),
+      card('COD a cobrar', currency(resumen.cod)),
+      card('Pedidos', resumen.conteo),
+      card('Ticket promedio', currency(resumen.promedio)),
+      card('Procesados', resumen.porEstado['Procesado']||0, 'por estado'),
+      card('Enviados', resumen.porEstado['Enviado']||0, 'por estado')
+    ].join('');
+    const cardsBox = document.getElementById('co-cards'); if(cardsBox) cardsBox.innerHTML = cardsHTML;
+
+    const body = rows.map(p=>`<tr><td>${p.codigo}</td><td>${new Date(p.fecha).toLocaleString('es-DO')}</td><td>${p.cliente.nombre}</td><td>${p.estado}</td><td style='text-align:right'>${currency(p.total)}</td></tr>`).join('');
+    const tabla = `<div class='card'><div class='content' style='padding:0'><table><thead><tr><th>Código</th><th>Fecha</th><th>Cliente</th><th>Estado</th><th>Total</th></tr></thead><tbody>${body}</tbody></table></div></div>`;
+    const tBox = document.getElementById('co-tabla'); if(tBox) tBox.innerHTML = tabla;
+  }
+
+  // === DELIVERY (Scan QR/Barcodes) ===
+  function renderDelivery(){
+    return `
+      <div class='card'><div class='content'>
+        <div style='display:flex; align-items:center; justify-content:space-between; gap:8px'>
+          <div>
+            <div class='title'>Delivery — Escanear</div>
+            <div class='hint'>Usa la cámara del celular para escanear <b>QR</b> o <b>código de barras</b> del pedido.</div>
+          </div>
+          <button class='btn' id='dlv-help'>¿Cómo funciona?</button>
+        </div>
+        <div class='row' style='margin-top:10px'>
+          <video id='dlv-video' autoplay playsinline style='width:100%;max-height:360px;border-radius:12px;border:1px solid var(--border)'></video>
+          <div style='display:flex; gap:8px; flex-wrap:wrap'>
+            <button class='btn' id='dlv-start'>🎥 Iniciar cámara</button>
+            <button class='btn' id='dlv-stop'>⏹️ Detener</button>
+            <input id='dlv-manual' class='input' placeholder='Ingresar código manualmente (PED-XXXXXX)'/>
+            <button class='btn primary' id='dlv-proc-cli'>✅ Marcar ENTREGADO al CLIENTE</button>
+            <button class='btn' id='dlv-proc-cur'>📦 Marcar ENTREGADO al COURIER</button>
+          </div>
+          <div id='dlv-last' class='hint'></div>
+        </div>
+      </div></div>`;
+  }
+  let dlvStream=null, dlvDetector=null, dlvLastCode='';
+  function stopDeliveryCam(){ try{ dlvStream?.getTracks()?.forEach(t=>t.stop()); }catch{} }
+  function processDelivery(code, destino){
+    const p = state.pedidos.find(x=>x.codigo===code) || state.pedidos.find(x=>x.id===code);
+    if(!p){ alert('Pedido no encontrado: '+code); return; }
+    const now=new Date().toISOString();
+    setState(s=>({
+      pedidos: s.pedidos.map(x=> x.id===p.id? {...x, estado:'Entregado'}:x),
+      entregas: [{id:uid(), pedidoId:p.id, codigo:p.codigo, destino, fecha:now}, ...s.entregas]
+    }));
+    el('#dlv-last')?.innerHTML = `Último: <b>${p.codigo}</b> → Entregado a <b>${destino}</b> (${new Date(now).toLocaleString('es-DO')})`;
+  }
+  function parsePayload(raw){
+    // Soporta formatos: "PED-123456", "ACLARA|PED-123456|CLIENTE", URL con ?code=PED-123456&to=CLIENTE
+    try{
+      const u=new URL(raw); const code=u.searchParams.get('code')||u.searchParams.get('pedido')||u.hash.replace('#',''); const to=(u.searchParams.get('to')||'').toUpperCase(); if(code){ return {code, to}; }
+    }catch{}
+    const parts=String(raw).trim();
+    if(parts.includes('|')){ const a=parts.split('|'); return { code: a.find(x=>x.startsWith('PED-'))||a[1]||parts, to:(a.find(x=>x==='CLIENTE'||x==='COURIER')||'').toUpperCase() } }
+    return { code: parts, to:'' };
+  }
+  function initDeliveryScan(){
+    const video=el('#dlv-video'); const startBtn=el('#dlv-start'); const stopBtn=el('#dlv-stop');
+    const manual=el('#dlv-manual'); const btnCli=el('#dlv-proc-cli'); const btnCur=el('#dlv-proc-cur');
+    el('#dlv-help').onclick=()=> alert('El repartidor puede escanear un QR con formato: ACLARA|PED-XXXXXX|CLIENTE o una URL con ?code=PED-XXXXXX&to=CLIENTE. También funciona con código de barras que contenga el PED-XXXXXX.');
+    btnCli.onclick=()=>{ const {code}=parsePayload(manual.value); if(!code) return alert('Ingresa el código'); processDelivery(code,'CLIENTE'); };
+    btnCur.onclick=()=>{ const {code}=parsePayload(manual.value); if(!code) return alert('Ingresa el código'); processDelivery(code,'COURIER'); };
+    stopBtn.onclick=()=>{ stopDeliveryCam(); };
+    startBtn.onclick=async()=>{
+      try{
+        if(!('BarcodeDetector' in window)) throw new Error('BarcodeDetector no soportado');
+        const formats = ['qr_code','code_128','code_39','ean_13','ean_8','upc_a','upc_e'];
+        dlvDetector = new BarcodeDetector({formats});
+        dlvStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode:'environment' } });
+        video.srcObject = dlvStream;
+        const scan = async()=>{
+          if(!dlvDetector||!video.srcObject) return;
+          try{
+            const barcodes = await dlvDetector.detect(video);
+            if(barcodes && barcodes.length){
+              const best = barcodes[0];
+              const raw = best.rawValue || '';
+              if(raw && raw!==dlvLastCode){
+                dlvLastCode=raw; const parsed=parsePayload(raw); manual.value = parsed.code; const to=parsed.to || '';
+                if(to){ processDelivery(parsed.code, to); }
+              }
+            }
+          }catch{}
+          if(video.srcObject) requestAnimationFrame(scan);
+        };
+        requestAnimationFrame(scan);
+      }catch(e){
+        alert('No se pudo iniciar la cámara o el lector no es compatible. Ingresa el código manualmente.');
+        console.warn(e);
+      }
+    };
+  }
+
+  function layout(){
+    const authed = !!state?.currentUser;
+    const body = ( currentTab==='inventario'?renderInventario() : currentTab==='pedidos'?renderPedidos() : currentTab==='clientes'?renderClientes() : currentTab==='conta'?renderContabilidad() : currentTab==='usuarios'?renderUsuarios() : currentTab==='delivery'?renderDelivery(): renderForm() );
+    const helpCard = (!authed && (currentTab==='form')) ? `<div class='row layout-5' style='gap:16px; margin-top:12px'><div></div><div><div class='card'><div class='content'><div style='font-weight:600; margin-bottom:8px'>Modo público</div><div class='hint'>Para ver Inventario, Pedidos, Contabilidad y Usuarios, inicia sesión con tu cuenta. La pestaña <b>Delivery (Scan)</b> se mantiene disponible para repartidores.</div></div></div></div></div>` : '';
+    return renderHeader()+renderTabs()+ body + helpCard;
+  }
+
+  async function render(){
+    const app=el('#app'); app.innerHTML=layout();
+    // navegación desktop tabs
+    els('[data-tab]').forEach(n=> n.onclick=()=>{
+      const target = n.dataset.tab; const authed = !!state?.currentUser;
+      if(!authed && target!=='form' && target!=='delivery'){ alert('Debes iniciar sesión para acceder a esta sección.'); openLogin(); return; }
+      currentTab = target; render();
+    });
+    // navegación mobile dropdown
+    const mob=el('#mobile-nav'); if(mob){ mob.onchange=(e)=>{ const target=e.target.value; const authed=!!state?.currentUser; if(!authed && target!=='form' && target!=='delivery'){ alert('Debes iniciar sesión para acceder a esta sección.'); openLogin(); mob.value=currentTab; return; } currentTab=target; render(); } }
+
+    const loginBtn=el('#btn-login'); if(loginBtn) loginBtn.onclick=openLogin; const logoutBtn=el('#btn-logout'); if(logoutBtn) logoutBtn.onclick=()=> setState({ currentUser:null });
+
+    if(currentTab==='inventario'){
+      const canEdit=state.currentUser?.rol==='Admin';
+      const btnNew=el('#btn-new-product'); if(btnNew) btnNew.onclick=()=> canEdit?showProductoForm(null):alert('Solo administradores');
+      els('[data-act="edit-product"]').forEach(b=> b.onclick=()=> canEdit?showProductoForm(b.dataset.id):alert('Solo administradores'));
+      els('[data-act="del-product"]').forEach(b=> b.onclick=()=>{ if(!canEdit) return alert('Solo administradores'); if(confirm('¿Eliminar producto?')) setState(s=>({...s, inventario:s.inventario.filter(p=>p.id!==b.dataset.id)})); });
+    }
+
+    if(currentTab==='form'){
+      const lines=[{id:uid(), productoId:state.inventario[0]?.id||'', cantidad:1}];
+      const couriers=[{id:uid(), courier:'', sucursal:'', costo:0, cod:false, codMonto:0}];
+      let comp=null;
+      const linesBox=el('#lines'); const courBox=el('#couriers'); const totBox=el('#totales');
+      function refresh(){
+        linesBox.innerHTML=renderLines(lines);
+        courBox.innerHTML=renderCouriers(couriers);
+        const primary=couriers[0];
+        const prodList=lines.map(l=>{ const p=state.inventario.find(x=>x.id===l.productoId)||{precio:0,nombre:''}; return { nombre:p.nombre, precio:Number(p.precio||0), cantidad:Number(l.cantidad||0) }; });
+        const t=calcTotales(prodList, primary?.costo||0);
+        totBox.innerHTML=`<div style='display:flex;justify-content:space-between'><span class='hint'>Subtotal</span><b>${currency(t.subtotal)}</b></div><div style='display:flex;justify-content:space-between'><span class='hint'>Envío (courier principal)</span><b>${currency(t.envio)}</b></div><div style='display:flex;justify-content:space-between'><span style='font-weight:600'>Total</span><b style='font-weight:600'>${currency(t.total)}</b></div>`;
+        // listeners por línea
+        els('[data-line]').forEach(box=>{
+          const id=box.getAttribute('data-line');
+          el('[data-role="prod"]',box).onchange=(e)=>{ const v=e.target.value; const L=lines.find(x=>x.id===id); L.productoId=v; refresh(); };
+          el('[data-role="cant"]',box).oninput=(e)=>{ const v=Number(e.target.value||1); const L=lines.find(x=>x.id===id); L.cantidad=v; refresh(); };
+          el('[data-role="rm"]',box).onclick=()=>{ if(lines.length>1){ const i=lines.findIndex(x=>x.id===id); lines.splice(i,1); refresh(); } };
+        });
+        // listeners couriers
+        els('[data-courier]').forEach(box=>{
+          const id=box.getAttribute('data-courier'); const C=couriers.find(x=>x.id===id);
+          el('[data-role="courier"]',box).onchange=(e)=>{ C.courier=e.target.value; };
+          el('[data-role="sucursal"]',box).oninput=(e)=>{ C.sucursal=e.target.value; };
+          el('[data-role="costo"]',box).oninput=(e)=>{ C.costo=Number(e.target.value||0); refresh(); };
+          const cod=el('[data-role="cod"]',box), codm=el('[data-role="codm"]',box);
+          cod.onchange=()=>{ C.cod=cod.checked; codm.disabled=!C.cod; };
+          codm.oninput=(e)=>{ C.codMonto=Number(e.target.value||0); };
+          const rmc=el('[data-role="rmc"]',box); if(rmc) rmc.onclick=()=>{ if(couriers.length>1){ const i=couriers.findIndex(x=>x.id===id); couriers.splice(i,1); refresh(); } };
+        });
+      }
+      refresh();
+      el('#line-add').onclick=()=>{ lines.push({id:uid(), productoId:state.inventario[0]?.id||'', cantidad:1}); refresh(); };
+      el('#courier-add').onclick=()=>{ couriers.push({id:uid(), courier:'', sucursal:'', costo:0, cod:false, codMonto:0}); refresh(); };
+      el('#comp-file').onchange=async(e)=>{ const f=e.target.files[0]; if(!f){ comp=null; el('#comp-preview').innerHTML=''; return; } if(!f.type.startsWith('image/')) return alert('Sube una imagen'); if(f.size>2*1024*1024) return alert('La imagen debe ser menor a 2MB.'); const dataUrl=await fileToDataURL(f); comp={name:f.name,type:f.type,size:f.size,dataUrl}; el('#comp-preview').innerHTML=`<img src='${dataUrl}' style='max-height:160px;border:1px solid #e5e7eb;border-radius:10px'/><div class='hint' style='margin-top:4px'>${f.name} • ${(f.size/1024).toFixed(0)} KB</div>`; };
+      el('#order-form').onsubmit=(e)=>{ e.preventDefault(); const nombre=el('[name="c-nombre"]').value.trim(); if(!nombre) return alert('Agrega el nombre del cliente'); const telefono=el('[name="c-telefono"]').value.trim(); const modalidad=el('[name="env-modalidad"]').value; const primary=couriers[0]||{costo:0}; const prodList=lines.map(l=>{ const p=state.inventario.find(x=>x.id===l.productoId)||{nombre:'',precio:0,foto:null,id:''}; return { productoId:p.id, nombre:p.nombre, precio:Number(p.precio||0), cantidad:Number(l.cantidad||0), foto:p.foto||null }; }).filter(x=>x.productoId); if(!prodList.length) return alert('Agrega al menos un producto'); const t=calcTotales(prodList, primary.costo||0); const pedido={ id:uid(), codigo:'PED-'+Date.now().toString().slice(-6), fecha:new Date().toISOString(), cliente:{nombre, telefono}, envio:{ modalidad, couriers:couriers.slice(), costo:t.envio }, items:prodList, subtotal:t.subtotal, notas:el('#order-notas').value, comprobante:comp, total:t.total, estado:'Nuevo' }; setState(s=>({...s, pedidos:[pedido, ...s.pedidos]})); alert('Pedido guardado: '+pedido.codigo); currentTab='pedidos'; render(); };
+    }
+
+    if(currentTab==='pedidos'){
+      el('#ped-export').onclick=()=>{ const rows=state.pedidos.map(p=>({ codigo:p.codigo, fecha:new Date(p.fecha).toLocaleString('es-DO'), cliente:p.cliente.nombre, telefono:p.cliente.telefono||'', modalidad:p.envio?.modalidad||'', courier_principal:p.envio?.couriers?.[0]?.courier||'', sucursal_principal:p.envio?.couriers?.[0]?.sucursal||'', envio_costo:p.envio?.costo||0, pago_contra_entrega:p.envio?.couriers?.[0]?.cod?'Sí':'No', cod_monto:p.envio?.couriers?.[0]?.cod?(p.envio?.couriers?.[0]?.codMonto||p.total):0, couriers:(p.envio?.couriers||[]).map(c=>`${c.courier}${c.sucursal?'-'+c.sucursal:''}`).join('|'), items:p.items.map(i=>`${i.nombre} x${i.cantidad}`).join('; '), tiene_comprobante:p.comprobante?.dataUrl?'Sí':'No', subtotal:p.subtotal ?? (p.total - (p.envio?.costo||0)), total:p.total, estado:p.estado })); exportCSV(rows, `pedidos_${Date.now()}.csv`); };
+      els('[data-pid]').forEach(row=>{ const id=row.getAttribute('data-pid');
+        el('[data-role="estado"]',row).onchange=(e)=> setState(s=>({...s, pedidos:s.pedidos.map(p=> p.id===id?{...p, estado:e.target.value}:p)}));
+        el('[data-act="proc"]',row).onclick=()=> setState(s=>({...s, pedidos:s.pedidos.map(p=> p.id===id?{...p, estado:'Procesado'}:p)}));
+        el('[data-act="env"]',row).onclick=()=> setState(s=>({...s, pedidos:s.pedidos.map(p=> p.id===id?{...p, estado:'Enviado'}:p)}));
+        el('[data-act="printA4"]',row).onclick=()=> printOrder(state.pedidos.find(p=>p.id===id));
+        el('[data-act="label"]',row).onclick=()=> printLabel4x6(state.pedidos.find(p=>p.id===id));
+        el('[data-act="del"]',row).onclick=()=>{ if(state.currentUser?.rol!=='Admin') return alert('Solo administradores pueden borrar pedidos.'); setState(s=>({...s, pedidos:s.pedidos.filter(p=>p.id!==id)})); };
+      });
+    }
+
+    if(currentTab==='clientes'){
+      el('#cli-export').onclick=()=>{ const map=new Map(); state.pedidos.forEach(p=>{ const key=(p.cliente.telefono||p.cliente.nombre).trim()||p.cliente.nombre; const prev=map.get(key)||{nombre:p.cliente.nombre, telefono:p.cliente.telefono||'', pedidos:0, total:0}; prev.pedidos+=1; prev.total+=p.total; map.set(key,prev); }); exportCSV(Array.from(map.values()), `clientes_${Date.now()}.csv`); };
+    }
+
+    if(currentTab==='conta'){
+      renderContabilidadContenido();
+      const apply=el('#co-aplicar'); if(apply) apply.onclick=()=>{ contaFiltros.desde=el('#co-desde').value; contaFiltros.hasta=el('#co-hasta').value; contaFiltros.estado=el('#co-estado').value; renderContabilidadContenido(); };
+      const exp=el('#co-export'); if(exp) exp.onclick=()=>{ const {rows}=calcularContabilidad(); const out=rows.map(p=>({codigo:p.codigo, fecha:new Date(p.fecha).toLocaleString('es-DO'), cliente:p.cliente.nombre, estado:p.estado, subtotal:(p.subtotal ?? (p.total - (p.envio?.costo||0))), envio:(p.envio?.costo||0), total:p.total})); exportCSV(out, `contabilidad_${Date.now()}.csv`); };
+    }
+
+    if(currentTab==='usuarios'){
+      const isAdmin=state.currentUser?.rol==='Admin';
+      if(isAdmin){ const btn=el('#usr-new'); if(btn) btn.onclick=showUserForm; els('[data-act="udel"]').forEach(b=> b.onclick=()=>{ const id=b.closest('[data-uid]').getAttribute('data-uid'); if(state.currentUser?.id===id) return alert('No puedes eliminar tu propio usuario activo.'); setState(s=>({...s, usuarios:s.usuarios.filter(u=>u.id!==id)})); }); }
+    }
+
+    if(currentTab==='delivery'){
+      initDeliveryScan();
+    }
+  }
+
+  function openLogin(){
+    const html=`<div class='overlay' id='login-modal'><div class='dialog'><div class='content'>
+      <div class='title'>Iniciar sesión</div>
+      <div class='row cols-2'>
+        <div><label class='label'>Usuario</label><select id='login-user' class='select'>${state.usuarios.map(u=>`<option value='${u.id}'>${u.nombre} — ${u.rol}</option>`).join('')}</select></div>
+        <div><label class='label'>PIN</label><input id='login-pin' type='password' inputmode='numeric' class='input' placeholder='0000'/></div>
+      </div>
+      <div class='hint' style='margin-top:6px'>Para seguridad real en línea usa autenticación con servidor (ej. Supabase). Aquí el login es local (PIN).</div>
+      <div style='display:flex; justify-content:flex-end; gap:8px; margin-top:12px'><button class='btn' id='login-cancel'>Cancelar</button><button class='btn primary' id='login-ok'>🔐 Ingresar</button></div>
+    </div></div></div>`;
+    document.body.insertAdjacentHTML('beforeend',html);
+    const modal=el('#login-modal');
+    el('#login-cancel',modal).onclick=()=>modal.remove();
+    el('#login-ok',modal).onclick=()=>{ const id=el('#login-user',modal).value; const pin=el('#login-pin',modal).value; const u=state.usuarios.find(x=>x.id===id); if(!u) return; if((u.pin||'')!==pin) return alert('PIN incorrecto'); setState({ currentUser:{ id:u.id, nombre:u.nombre, rol:u.rol } }); modal.remove(); };
+    modal.onclick=(e)=>{ if(e.target===modal) modal.remove(); }
+  }
+
+  // ======== SELF TESTS (mínimos) ========
+  function runSelfTests(){
+    try{
+      console.log('[Tests] Iniciando pruebas…');
+      console.assert(typeof contaFiltros==='object', 'contaFiltros debe existir');
+      // contabilidad básica
+      const fakeState = { pedidos:[
+        { fecha:'2024-01-01T12:00:00Z', codigo:'T1', estado:'Nuevo', subtotal:1000, envio:{costo:200, couriers:[{cod:false}]}, total:1200, cliente:{nombre:'A'} },
+        { fecha:'2024-01-02T12:00:00Z', codigo:'T2', estado:'Enviado', subtotal:500, envio:{costo:100, couriers:[{cod:true, codMonto:400}]}, total:600, cliente:{nombre:'B'} }
+      ]};
+      const prevState = state; state=fakeState; contaFiltros={desde:'',hasta:'',estado:'Todos'};
+      const r1 = calcularContabilidad();
+      console.assert(r1.resumen.total===1800, 'Total esperado 1800');
+      console.assert(r1.resumen.envio===300, 'Envío esperado 300');
+      console.assert(r1.resumen.cod===400, 'COD esperado 400');
+      // filtro por estado
+      contaFiltros={desde:'',hasta:'',estado:'Enviado'}; const r2=calcularContabilidad();
+      console.assert(r2.rows.length===1 && r2.rows[0].codigo==='T2', 'Filtro por estado Enviado');
+      // code39
+      const okSVG = toCode39SVG('TEST123').startsWith('<svg');
+      console.assert(okSVG,'Debe generar SVG Code39');
+      const dummyUrl = openHTML("<!doctype html><meta charset='utf-8'><title>Test</title><p>ok</p>");
+      console.assert(typeof dummyUrl==='string','openHTML debe devolver URL de blob');
+      console.assert(typeof printOrder==='function','printOrder debe existir');
+      console.assert(typeof printLabel4x6==='function','printLabel4x6 debe existir');
+      console.assert(typeof renderDelivery==='function' && typeof initDeliveryScan==='function','Delivery scan debe existir');
+      state = prevState;
+      console.log('[Tests] OK');
+    }catch(e){ console.warn('[Tests] fallo', e); }
+  }
+
+  // Boot
+  (function boot(){ state = loadLocal(); render(); runSelfTests(); })();
+})();
+</script>
+</body>
+</html>
